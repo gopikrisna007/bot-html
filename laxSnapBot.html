@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Chat Bot</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+	var accessToken = "4dda266e87de466ebd8730a4cf4112f4";
+	var baseUrl = "https://api.dialogflow.com/v1/";
+	var conversation = [];
+	$(document).ready(function() {
+		$("#input").keypress(function(event) {
+			if (event.which == 13) {
+				event.preventDefault();
+				send();
+				event.currentTarget.value = '';
+			}
+		});
+
+		$("#imageInput").click(function(event) {
+			uploadImage();
+		});
+
+		$("#rec").click(function(event) {
+			switchRecognition();
+		});
+	});
+
+	function uploadImage() {
+		/* Insert code here. */
+	}
+	var recognition;
+	function startRecognition() {
+		recognition = new webkitSpeechRecognition();
+		recognition.onstart = function(event) {
+			updateRec();
+		};
+		recognition.onresult = function(event) {
+			var text = "";
+			for (var i = event.resultIndex; i < event.results.length; ++i) {
+				text += event.results[i][0].transcript;
+			}
+			setInput(text);
+			stopRecognition();
+		};
+		recognition.onend = function() {
+			stopRecognition();
+		};
+		recognition.lang = "en-US";
+		recognition.start();
+	}
+
+	function stopRecognition() {
+		if (recognition) {
+			recognition.stop();
+			recognition = null;
+		}
+		updateRec();
+	}
+
+	function switchRecognition() {
+		if (recognition) {
+			stopRecognition();
+		} else {
+			startRecognition();
+		}
+	}
+
+	function setInput(text) {
+		$("#input").val(text);
+		send();
+	}
+
+	function send() {
+		var user_input = "You: "  + $("#input").val();
+		var newDiv = document.createElement('div');
+		newDiv.className = "self";
+		var label = document.createTextNode(user_input);
+		var elements = document.getElementsByClassName('chat-box');
+		var uploaderDiv = elements[0];
+		newDiv.appendChild(label);
+		elements[0].appendChild(newDiv, uploaderDiv.children[0]);
+
+		$
+				.ajax({
+					type : "POST",
+					url : baseUrl + "query?v=20150910",
+					contentType : "application/json; charset=utf-8",
+					dataType : "json",
+					headers : {
+						"Authorization" : "Bearer " + accessToken
+					},
+					data : JSON.stringify({
+						query : user_input,
+						lang : "en",
+						sessionId : "somerandomthing"
+					}),
+					success : function(data) {
+						var megan = data.result.fulfillment.speech;
+						var answer = "Megan: " + megan;
+						if (answer.indexOf("Package") > -1) {
+							answer = "Choose Package"
+						}
+						var newDiv = document.createElement('div');
+						newDiv.className = 'AI';
+						var answer;
+						if (answer.indexOf("Package") > -1) {
+							newDiv.innerHTML = "<ul><li><a href='#' onclick='pop1()'aria-label = 'We cover areas of divorce procedure such as how to file, what grounds are accepted, key legal jargon, whether to leave the home and how to handle a divorce petition.'>Package1: You Wish to Get a Divorce: Grounds, Procedure and What to Do During the Process</a></li><li><a href='#' onclick='pop2()'aria-label = 'We will walk you through when defending your divorce is an appropriate action, the process involved and help you decide if this course is right for you. We will also explain Matrimonial Home Rights and present a step by step guide to protect your right to stay in your home throughout the divorce proceedings.'>Package2: Your Spouse Has Filed for Divorce</a></li><li><a href='#' onclick='pop3()'aria-label = 'In this package, we discuss international divorce including different jurisdictions and explain the key terms. We will outline what we know about how Brexit affects the process going forward.'>Package3: International Divorce and Brexit</a></li><li><a href='#' onclick='pop4()'aria-label = 'We explain your options and how to proceed if you can’t agree how to split your assets, or if you can, then how to protect yourself from future financial obligation.'>Package4: Division of Assets on Divorce</a></li><li><a href='#' onclick='pop5()'aria-label = 'In this package we look at what happens after divorce, including parental responsibility, changing or enforcing maintenance payments and which decisions regarding children you can make independently.'>Package5: What Happens after the Divorce?</a></li><li><a href='#' onclick='pop6()'aria-label = 'Here we explain how to find out whether your marriage or civil partnership was valid, the reasons a marriage may be voidable, and how to file a nullity petition.'>Package6: Doubts as to the Validity of the Marriage</a></li><li><a href='#' onclick='pop7()'aria-label = 'Here you will learn the basics about the parental responsibility and maintenance of children on separation. See our section on children for more details about children on separation.'>Package7: Children on Separation</a></li><li><a href='#' onclick='pop8()'aria-label = 'In this package, we will explain the process of applying for a non-molestation or emergency order to protect you and your family, from application to the court’s decision.'>Package8: Violence, Harassment or Threats: Non-molestation Order</a></li><li><a href='#' onclick='pop9()'aria-label = 'If you can’t afford a lawyer all is not lost. There are options open to you. In this package, we will take you through what you can do to cover your lawyers’ fees.'>Package9: Legal Help: What if I can’t afford a lawyer?</a></li></ul>";
+						} else if (answer.indexOf("Package_2") > -1) {
+							newDiv.innerHTML = "<ul><li><a href='#' onclick='pop1()'>Goto link1</a></li></ul>";
+						} else if (answer.indexOf("Package_3") > -1) {
+							newDiv.innerHTML = "<ul><li><a href='#' onclick='pop1()'>Goto link2</a></li></ul>";
+						}
+						var label = document.createTextNode(answer);
+						var elements = document
+								.getElementsByClassName('chat-box');
+						var uploaderDiv = elements[0];
+						newDiv.appendChild(label);
+						elements[0]
+								.appendChild(newDiv, uploaderDiv.children[0]);
+						$("#response").stop().animate({
+							scrollTop : $('#response')[0].scrollHeight
+						}, 100);
+					},
+					error : function() {
+						conversation.push('AI:' + "Initial Response Error"
+								+ '\r\n');
+						$("#response").text(val);
+						$("#response").text(conversation.join(''));
+					}
+				});
+	}
+	function pop1() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('We cover areas of divorce procedure such as how to file, what grounds are accepted, key legal jargon, whether to leave the home and how to handle a divorce petition.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop2() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('We will walk you through when defending your divorce is an appropriate action, the process involved and help you decide if this course is right for you. We will also explain Matrimonial Home Rights and present a step by step guide to protect your right to stay in your home throughout the divorce proceedings.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop3() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('In this package, we discuss international divorce including different jurisdictions and explain the key terms. We will outline what we know about how Brexit affects the process going forward.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop4() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('We explain your options and how to proceed if you can’t agree how to split your assets, or if you can, then how to protect yourself from future financial obligation.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop5() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('In this package we look at what happens after divorce, including parental responsibility, changing or enforcing maintenance payments and which decisions regarding children you can make independently.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop6() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('Here we explain how to find out whether your marriage or civil partnership was valid, the reasons a marriage may be voidable, and how to file a nullity petition.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop7() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('Here you will learn the basics about the parental responsibility and maintenance of children on separation. See our section on children for more details about children on separation.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop8() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('In this package, we will explain the process of applying for a non-molestation or emergency order to protect you and your family, from application to the court’s decision.');
+		OpenWindow.document.body.appendChild(text);
+	}
+	function pop9() {
+		var OpenWindow = window.open('', 'popup',
+				'width=300,height=300,resizable=1,top=100,left=100');
+		var text = document
+				.createTextNode('If you can’t afford a lawyer all is not lost. There are options open to you. In this package, we will take you through what you can do to cover your lawyers’ fees.');
+		OpenWindow.document.body.appendChild(text);
+	}
+</script>
+<style type="text/css">
+body {
+	font-family: Arial Unicode MS, Arial, sans-serif;
+}
+
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+.self {
+    text-align:left;
+	width: 98%;
+	padding: 10px;
+	margin: 10px;
+	background: #A6DBF7;
+	border-radius: 5px;
+	font-size: 16px;
+	font-family: Arial Unicode MS, Arial, sans-serif;
+}
+
+.AI {
+    text-align:left;
+	-webkit-transition: background-color 3s ease-in-out;
+	-moz-transition: background-color 3s ease-in-out;
+	transition: background-color 3s ease-in-out;
+	-webkit-perspective: 5000;
+	-moz-perspective: 5000;
+	-ms-perspective: 5000;
+	-webkit-transition-duration: 2s;
+	-moz-transition-duration: 2s;
+	-ms-transition-duration: 2s;
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	-ms-transform-style: preserve-3d;
+	width: 98%;
+	padding: 10px;
+	margin: 10px;
+	background: #DAF7A6;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+.AI ul li a {
+	color: #fff;
+}
+
+.AI ul li {
+	list-style-type: none;
+}
+
+.AI ul li a:hover {
+	position: relative;
+}
+
+.AI ul li a[aria-label]:hover:after {
+	content: attr(aria-label);
+	padding: 4px 8px;
+	position: absolute;
+	left: 0;
+	top: 100%;
+	/* white-space: nowrap;*/
+	/* z-index: 20px;*/
+	background: #2b303e;
+	min-width: 250px;
+}
+
+.chat-box {
+	width: 98%;
+	height: 450px;
+	border-radius: 5px;
+	margin-left: 10px;
+	margin-right: 10px;
+	border: 1px solid #f8f8f8;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-box-shadow: inset 0px 0px 20px #d3d3d3;
+	-moz-box-shadow: inset 0px 0px 20px #d3d3d3;
+	box-shadow: inset 0px 0px 20px #d3d3d3;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+.chat-box::-webkit-scrollbar {
+	width: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+	border-radius: 5px;
+	background: rgba(0, 0, 0, .1);
+}
+
+.other_buttons {
+	margin: 5px;
+}
+
+#rec {
+	height: 50px;
+}
+
+.form-control {
+	width: 98%;
+	height: 75px;
+	font-size: 16px;
+	border-radius: 5px;
+	margin-left: 5px;
+	padding-left: 10px;
+	border: 1px solid #f8f8f8;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-box-shadow: inset 0px 0px 20px #d3d3d3;
+	-moz-box-shadow: inset 0px 0px 20px #d3d3d3;
+	box-shadow: inset 0px 0px 20px #d3d3d3;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+.container {
+	width: 100%;
+	padding: 0px auto;
+}
+
+.header {
+	width: 100%;
+	height: 80px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<table style="width: 100%">
+				<tr>
+					<th style="padding-top: 20px; align: center; width: 100%;"><img
+						src="https://www.lexsnap.com/images/logo.svg" width="350px"
+						height="50px"></th>
+				</tr>
+			</table>
+		</div>
+		<div class="chat-box" id="response"></div>
+		<div class="other_buttons">
+			<input id="input" type="text" class="form-control"
+				placeholder="Type here..." autocomplete="off">
+		</div>
+	</div>
+	<div style="margin-right:25px;float:right;">
+		<img
+			src="https://www.vrittianalytics.com/wp-content/uploads/2017/12/vritti-logo-black.png"
+			width="150px">
+	</div>
+
+</body>
+</html>
